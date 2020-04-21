@@ -1,0 +1,24 @@
+mapper  xml映射文件（主要是表头）
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Maper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springboottest.project.dao.StudentMapper">
+<!--    1.查询所有-->
+    <resultMap id="student_map" type="com.springboottest.project.entities.Student">
+        <result property="id" column="id"></result>
+        <result property="name" column="student_name"></result>
+        <result property="age" column="student_age"></result>
+        <result property="classId" column="class_id"></result>
+    </resultMap>
+    <select id="queryAllData" resultMap="student_map">
+        select id,student_name,student_age,class_id
+        from student_mysql
+    </select>
+
+<!--    2.新增一个对象-->
+    <insert id="addOneStudent" >
+        insert into student_mysql(id,student_name,student_age,class_id,interfacetime)
+        values (#{id},#{name},#{age},#{classId},now())
+    </insert>
+</mapper>
