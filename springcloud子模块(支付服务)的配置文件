@@ -1,0 +1,17 @@
+主要是 服务端口，数据源配置（yml文件版本的）
+
+
+server:
+  port: 8001
+spring:
+  application:
+    name: cloud-payment-service
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/aaatest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: 123456
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/**/*.xml
+  type-aliases-package: com.northcastle.springcloud.entities
