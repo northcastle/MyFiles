@@ -1,0 +1,75 @@
+1.#mysql配置
+spring.datasource.mysql.driver=com.mysql.cj.jdbc.Driver
+spring.datasource.mysql.url=jdbc:mysql://localhost:3306/aaatest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+spring.datasource.mysql.username=root
+spring.datasource.mysql.password=123456
+
+
+
+2.数据源配置类
+
+@Configuration
+public class DataSourceConfig {
+
+    @Autowired
+    private Environment env;
+
+    @Bean("dataSourceMysql")
+    @Primary
+    public DataSource createDatasourceMysql(){
+        PooledDataSource pooledDataSource = new PooledDataSource();
+
+        String driver = env.getProperty("spring.datasource.mysql.driver");
+        String url = env.getProperty("spring.datasource.mysql.url");
+        String username = env.getProperty("spring.datasource.mysql.username");
+        String password = env.getProperty("spring.datasource.mysql.password");
+
+        pooledDataSource.setDriver(driver);
+        pooledDataSource.setUrl(url);
+        pooledDataSource.setUsername(username);
+        pooledDataSource.setPassword(password);
+
+        pooledDataSource.setPoolPingEnabled(true);
+        pooledDataSource.setPoolPingQuery("select 1");
+
+        return pooledDataSource;
+    }
+}
+
+
+3.mybatis配置类
+
+@Configuration
+@MapperScan(basePackages = {"com.springboottest.project.dao"},
+        sqlSessionFactoryRef = "sqlSessionFactoryMysql",
+        sqlSessionTemplateRef = "sqlSessionTemplateMysql"
+)
+public class MybatisConfig {
+
+    @Bean("sqlSessionFactoryMysql")
+    @Primary
+    public SqlSessionFactory createSqlSessionFactoryMysql(
+            @Qualifier("dataSourceMysql") DataSource dataSource,
+            ApplicationContext applicationContext
+    ) throws Exception {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:mybatis/mapper/**/*.xml"));
+        sqlSessionFactoryBean.setTypeAliasesPackage("com.springboottest.project.entities");
+        sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
+
+
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean("sqlSessionTemplateMysql")
+    public SqlSessionTemplate createSqlSessionTemplate(
+            @Qualifier( "sqlSessionFactoryMysql") SqlSessionFactory sqlSessionFactory
+    ){
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
+
+}
+
